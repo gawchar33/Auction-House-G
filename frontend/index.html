@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auction System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="profile.html">Profile</a>
+
+ <a href="#" onclick="logout()">Logout</a>
+</div>
+
+<div class="container">
+    <div class="card search-card">
+        <h2>Welcome</h2>
+        <p>To Auction House</p>
+
+        <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search products or categories..."
+        >
+    </div>
+</div>
+
+<script src="auth.js"></script>
+</body>
+<script>
+const uid = localStorage.getItem("user_id");
+console.log("INDEX user_id =", uid);
+</script>
+
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profile</title>
+</head>
+<body>
+
+<h2>User Profile</h2>
+
+<div id="profile">Loading...</div>
+
+<button onclick="logout()">Logout</button>
+
+<script>
+const userId = localStorage.getItem("user_id");
+console.log("PROFILE user_id =", userId);
+
+if (!userId) {
+  alert("Please login first");
+  window.location.href = "login.html";
+}
+
+// fetch profile
+fetch(`http://127.0.0.1:8000/auth/profile/${userId}/`)
+.then(r => r.json())
+.then(data => {
+  document.getElementById("profile").innerHTML = `
+    <p><b>Username:</b> ${data.username}</p>
+    <p><b>Email:</b> ${data.email}</p>
+  `;
+});
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

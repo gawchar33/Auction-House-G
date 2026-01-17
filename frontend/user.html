@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="userApp">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JS -->
+    <script src="user.js"></script>
+</head>
+
+<body ng-controller="UserController">
+    <div class="navbar">
+    <div class="nav-left">
+        <div class="logo">Auction</div>
+        <a href="index.html">Home</a>
+        <a href="product.html">Products</a>
+        <a href="category.html">Categories</a>
+        <a href="customer.html">Customers</a>
+    </div>
+
+    <div class="nav-right">
+        <a href="signup.html">Signup</a>
+        <a href="login.html">Login</a>
+    </div>
+</div>
+
+
+    <h1>User Management</h1>
+
+    <!-- USER FORM -->
+    <div class="card">
+        <h2>{{ user.id ? 'Edit User' : 'Create User' }}</h2>
+
+        <input type="text" ng-model="user.username" placeholder="Username">
+        <input type="email" ng-model="user.email" placeholder="Email">
+        <input type="text" ng-model="user.first_name" placeholder="First Name">
+        <input type="text" ng-model="user.last_name" placeholder="Last Name">
+        <input type="password" ng-model="user.password" placeholder="Password">
+
+        <button ng-click="saveUser()">
+            {{ user.id ? 'Update' : 'Create' }}
+        </button>
+
+        <button class="cancel" ng-if="user.id" ng-click="cancelEdit()">
+            Cancel
+        </button>
+    </div>
+
+    <!-- USER LIST -->
+    <div class="card">
+        <h2>User List</h2>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+
+            <tr ng-repeat="u in users">
+                <td>{{u.id}}</td>
+                <td>{{u.username}}</td>
+                <td>{{u.email}}</td>
+                <td>{{u.first_name}} {{u.last_name}}</td>
+                <td>
+                    <button ng-click="editUser(u)">Edit</button>
+                    <button class="delete" ng-click="deleteUser(u.id)">Delete</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
