@@ -1,37 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="customerApp">
 <head>
-    <title>Customer</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Customers</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="customer.js"></script>
 </head>
-<body>
+<body ng-controller="CustomerController">
 
-<div class="navbar">
-    <div class="logo">Auction</div>
-    <div>
-        <a href="index.html">Home</a>
-        <a href="product.html">Products</a>
-        <a href="category.html">Categories</a>
+  <div class="customer-wrapper">
+    <div class="form-card">
+      <h1 class="card-title">Add Customer</h1>
+
+      <form name="custForm" ng-submit="editMode ? updateCustomer() : createCustomer()" novalidate>
+        <div class="row">
+          <label class="field">
+            <span class="label">Name</span>
+            <input type="text" ng-model="customer.name" placeholder="Full name" required />
+          </label>
+
+          <label class="field">
+            <span class="label">Phone</span>
+            <input type="text" ng-model="customer.phone" placeholder="+1 555 555 5555" required />
+          </label>
+        </div>
+
+        <div class="row">
+          <label class="field">
+            <span class="label">Email</span>
+            <input type="email" ng-model="customer.email" placeholder="email@example.com" required />
+          </label>
+
+          <label class="field">
+            <span class="label">Address</span>
+            <input type="text" ng-model="customer.address" placeholder="Street, City, State" />
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn primary" type="submit" ng-disabled="custForm.$invalid">Add Customer</button>
+          <button class="btn neutral" type="button" ng-if="editMode" ng-click="cancelEdit()">Cancel</button>
+        </div>
+
+        <div class="status" ng-if="status">{{ status }}</div>
+      </form>
     </div>
-</div>
 
-<div class="container">
-    <div class="card">
-        <h1>Add Customer</h1>
-        <input type="text" placeholder="Name">
-        <input type="text" placeholder="Phone">
-        <input type="email" placeholder="Email">
-        <input type="text" placeholder="Address">
-        <button>Add Customer</button>
+    <div class="list-card">
+      <h2 class="list-title">Customer List</h2>
 
-        <h2>Customer List</h2>
-        <table>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
             <tr>
-                <th>ID</th><th>Name</th><th>Email</th><th>Phone</th>
+              <th class="col-id">ID</th>
+              <th class="col-name">Name</th>
+              <th class="col-email">Email</th>
+              <th class="col-phone">Phone</th>
+              <th class="col-address">Address</th>
+              <th class="col-actions">Actions</th>
             </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="c in customers">
+              <td>{{ c.id }}</td>
+              <td>{{ c.name }}</td>
+              <td>{{ c.email }}</td>
+              <td>{{ c.phone }}</td>
+              <td class="address-col">{{ c.address || '—' }}</td>
+              <td class="actions-col">
+                <button class="btn small" ng-click="editCustomer(c)">Edit</button>
+                <button class="btn danger small" ng-click="deleteCustomer(c.id)">Delete</button>
+              </td>
+            </tr>
+            <tr ng-if="!customers.length">
+              <td colspan="6" class="empty">No customers found.</td>
+            </tr>
+          </tbody>
         </table>
+      </div>
     </div>
-</div>
+  </div>
 
 </body>
 </html>

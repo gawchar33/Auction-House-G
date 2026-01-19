@@ -1,37 +1,136 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html ng-app="auctionApp">
 <head>
-    <title>Auction System</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Auction House</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
 </head>
-<body>
+<body ng-controller="HomeController" ng-cloak>
 
-<div class="navbar">
-    <a href="index.html">Home</a>
-    <a href="profile.html">Profile</a>
+  <!-- NAVBAR -->
+  <nav class="site-nav" ng-controller="NavController" aria-label="Main navigation">
+    <div class="nav-inner container">
+      <a class="brand" href="index.html">
+        <span class="brand-title">Auction <span class="brand-highlight">House</span></span>
+      </a>
 
- <a href="#" onclick="logout()">Logout</a>
-</div>
+      <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="category.html">Categories</a></li>
+        <li><a href="product.html">Products</a></li>
+        <li><a href="auction.html">Auctions</a></li>
+      </ul>
 
-<div class="container">
-    <div class="card search-card">
-        <h2>Welcome</h2>
-        <p>To Auction House</p>
+      <div class="nav-actions">
+        <div class="nav-search">
+          <input type="search" ng-model="q" placeholder="Search products..." aria-label="Search products">
+        </div>
 
-        <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Search products or categories..."
-        >
+        <div class="action-links" ng-show="!isAuthenticated">
+          <a class="link" href="login.html">Login</a>
+          <a class="btn small" href="signup.html">Sign Up</a>
+        </div>
+
+        <!-- profile button appears after login (NavController manages isAuthenticated/user) -->
+        <div class="action-user" ng-show="isAuthenticated">
+          <button class="avatar-btn" ng-click="toggleUserMenu($event)" aria-expanded="{{userMenu}}">
+            <span class="name">{{ user.first_name || user.username || 'Divya' }}</span>
+          </button>
+          <ul class="avatar-menu" ng-class="{'open': userMenu}" ng-click="$event.stopPropagation()">
+            <li><a href="#" ng-click="goProfile()">Profile</a></li>
+            <li><a href="orders.html">My Bids</a></li>
+            <li class="sep"><a href="#" ng-click="logout()">Logout</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
-</div>
+  </nav>
 
-<script src="auth.js"></script>
+  <!-- MAIN -->
+  <main class="container main-wrap">
+    <section class="featured" aria-label="Featured auctions">
+      <!-- stylish section heading -->
+      <div class="section-head">
+        <h2 class="page-title">Featured Auctions</h2>
+      </div>
+
+      <!-- categories bar (populated from backend) -->
+      <div class="categories-bar" ng-if="categories && categories.length">
+        <div class="container categories-inner">
+          <a class="cat-pill" ng-repeat="c in categories" href="category.html?name={{c.slug || c.name}}">
+            {{ c.name }}
+          </a>
+        </div>
+      </div>
+
+      <div class="grid product-grid" ng-init="products = [
+        {id:1,name:'Vintage Camera',image:'https://picsum.photos/seed/p1/600/400',base:120,current:180,cat:'Electronics'},
+        {id:2,name:'Antique Vase',image:'https://picsum.photos/seed/p2/600/400',base:350,current:420,cat:'Collectibles'},
+        {id:3,name:'Signed Poster',image:'https://picsum.photos/seed/p3/600/400',base:40,current:60,cat:'Collectibles'},
+        {id:4,name:'Designer Watch',image:'https://picsum.photos/seed/p4/600/400',base:520,current:640,cat:'Accessories'},
+        {id:5,name:'Classic Radio',image:'https://picsum.photos/seed/p5/600/400',base:80,current:110,cat:'Electronics'},
+        {id:6,name:'Oil Painting',image:'https://picsum.photos/seed/p6/600/400',base:240,current:300,cat:'Art'}
+      ]">
+        <div class="card product-card" ng-repeat="p in products | filter:searchFilter">
+          <img ng-src="{{p.image}}" alt="{{p.name}}">
+          <div class="card-body">
+            <h3>{{p.name}}</h3>
+            <div class="meta"><strong>Base</strong> ${{p.base}} • <strong>Current</strong> ${{p.current}}</div>
+            <div class="card-actions">
+              <button class="btn primary" ng-click="placeBid(p)">Bid</button>
+              <a class="link" href="product.html?id={{p.id}}">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer container">
+    <div id="site-year">© Auction House</div>
+  </footer>
+
+  <script>
+    // minimal controller to power products and search (assumes module auctionApp exists in app.js)
+    angular.module('auctionApp').controller('HomeController', ['$scope', '$window', '$http', function($scope, $window, $http){
+      $scope.q = '';
+      $scope.year = new Date().getFullYear();
+      $scope.placeBid = function(p){
+        $window.alert('Place bid on: ' + p.name);
+      };
+
+      // load categories from backend (expects 3 categories to be added there)
+      $scope.categories = [];
+      try {
+        var endpoint = (window.BACKEND || 'http://127.0.0.1:8000') + '/categories/';
+        $http.get(endpoint, { withCredentials: true })
+          .then(function(res){ $scope.categories = res.data || []; })
+          .catch(function(err){
+            console.warn('[HOME] categories load failed', err && (err.status || err.message));
+            $scope.categories = [];
+          });
+      } catch (e) { console.error('[HOME] categories init error', e); }
+
+      // case-insensitive search filter using the q model
+      $scope.searchFilter = function(item){
+        if(!$scope.q) return true;
+        var q = ($scope.q || '').toLowerCase();
+        return (item.name||'').toLowerCase().indexOf(q) !== -1 || (item.cat||'').toLowerCase().indexOf(q) !== -1;
+      };
+
+      // expose year into footer (unchanged) - guard DOM access
+      try {
+        var sy = document.getElementById('site-year');
+        if (sy) sy.textContent = '© ' + ($scope.year || (new Date()).getFullYear()) + ' Auction House';
+      } catch (e) { console.warn('[HOME] site-year update failed', e); }
+
+      // ensure NavController available (auth.js) will set isAuthenticated/user
+    }]);
+  </script>
+
 </body>
-<script>
-const uid = localStorage.getItem("user_id");
-console.log("INDEX user_id =", uid);
-</script>
-
-
 </html>

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from category.models import Category
 
 
 class Auction(models.Model):
@@ -20,7 +19,7 @@ class Auction(models.Model):
     )
 
     category = models.ForeignKey(
-        Category,
+        'category.Category',   # <- use string reference to avoid import errors
         on_delete=models.SET_NULL,
         null=True,
         blank=True

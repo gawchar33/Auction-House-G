@@ -1,40 +1,97 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html ng-app="auctionApp">
 <head>
-  <title>Profile</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profile — Auction House</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  <script src="profile.js"></script>
 </head>
-<body>
+<body ng-controller="ProfileController" class="auth-fullscreen">
+  <main class="auth-wrap card profile-wrap">
+    <div class="profile-card container-lg elevated">
+      <div class="profile-header">
+        <h2>Your profile</h2>
+        <div class="actions">
+          <!-- prominent edit button -->
+          <button class="btn gradient accent" ng-click="toggleEdit()" ng-if="!edit">Edit profile</button>
+          <button class="btn outline" ng-click="toggleEdit()" ng-if="edit">Cancel</button>
+        </div>
+      </div>
 
-<h2>User Profile</h2>
+      <section class="profile-grid">
+        <aside class="profile-side">
+          <div class="avatar-box">
+            <img ng-src="{{ preview || defaultAvatar }}" alt="avatar" class="avatar-large" />
+            <label class="photo-btn" ng-if="edit">
+              Change photo
+              <input type="file" accept="image/*" onchange="angular.element(this).scope().onFileChange(this.files)" />
+            </label>
+          </div>
 
-<div id="profile">Loading...</div>
+          <div class="profile-basic">
+            <h3 class="profile-name">{{ form.name || '—' }}</h3>
+            <!-- email removed from the side summary as requested -->
+            <div class="muted" ng-if="form.phone">{{ form.phone }}</div>
+          </div>
+        </aside>
 
-<button onclick="logout()">Logout</button>
+        <div class="profile-main">
+          <!-- VIEW MODE -->
+          <div ng-if="!edit" class="profile-view card-light">
+            <h4>Details</h4>
+            <div class="view-row"><strong>Name</strong><span>{{ form.name || '—' }}</span></div>
+            <div class="view-row"><strong>Email</strong><span>{{ form.email || '—' }}</span></div>
+            <div class="view-row"><strong>Phone</strong><span>{{ form.phone || '—' }}</span></div>
+            <div class="view-row"><strong>Address</strong><span>{{ form.address || '—' }}</span></div>
+          </div>
 
-<script>
-const userId = localStorage.getItem("user_id");
-console.log("PROFILE user_id =", userId);
+          <!-- EDIT MODE -->
+          <form ng-if="edit" name="profileForm" novalidate ng-submit="save($event)" class="profile-form card-light">
+            <div class="form-row">
+              <label>Full name</label>
+              <input type="text" ng-model="form.name" placeholder="First Last" class="input" required />
+            </div>
 
-if (!userId) {
-  alert("Please login first");
-  window.location.href = "login.html";
-}
+            <div class="form-row">
+              <label>Email</label>
+              <input type="email" ng-model="form.email" placeholder="you@example.com" class="input" required />
+            </div>
 
-// fetch profile
-fetch(`http://127.0.0.1:8000/auth/profile/${userId}/`)
-.then(r => r.json())
-.then(data => {
-  document.getElementById("profile").innerHTML = `
-    <p><b>Username:</b> ${data.username}</p>
-    <p><b>Email:</b> ${data.email}</p>
-  `;
-});
+            <div class="form-row inline">
+              <div style="flex:1">
+                <label>Phone</label>
+                <input type="tel" ng-model="form.phone" placeholder="+1 555 555 5555" class="input" />
+              </div>
+              <div style="flex:1;align-self:flex-end">
+                <label>Photo</label>
+                <label class="photo-btn small">
+                  Choose...
+                  <input type="file" accept="image/*" onchange="angular.element(this).scope().onFileChange(this.files)" />
+                </label>
+              </div>
+            </div>
 
-function logout() {
-  localStorage.clear();
-  window.location.href = "login.html";
-}
-</script>
+            <div class="form-row">
+              <label>Address</label>
+              <textarea ng-model="form.address" placeholder="Street, City, Country" rows="3" class="input"></textarea>
+            </div>
 
+            <div class="form-actions">
+              <button class="btn gradient" type="submit" ng-disabled="saving">{{ saving ? 'Saving...' : 'Save profile' }}</button>
+              <a class="link muted" href="index.html">Back to home</a>
+            </div>
+
+            <div class="form-note" ng-if="message" ng-class="{'error': messageType==='error','success': messageType==='success'}">
+              {{ message }}
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
 </body>
 </html>

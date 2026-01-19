@@ -25,7 +25,24 @@ SECRET_KEY = "django-insecure-ktgudkr1kvctjvc^nc7xcn^b37!yo2qf1vw9rhcr0f5yb=c+5(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+
+# CORS / CSRF for frontend served at 127.0.0.1:5500
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+]
+
+# Cookie behavior for dev
+CSRF_COOKIE_SAMESITE = 'Lax'
+# CSRF_COOKIE_SECURE = False  # leave default for dev; set True for HTTPS
 
 
 # Application definition
@@ -46,10 +63,12 @@ INSTALLED_APPS = [
     'product',
     'category',
     'auction',
-    'authapp'
+    'authapp',
+    'bidding',
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -57,9 +76,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 
@@ -130,3 +146,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 CORS_ALLOW_ALL_ORIGINS =True
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

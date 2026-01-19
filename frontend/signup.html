@@ -1,26 +1,56 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html ng-app="auctionApp">
 <head>
-    <title>Signup</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign up — Auction House</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
 </head>
-<body>
+<body ng-controller="AuthController" class="auth-fullscreen" ng-cloak>
 
-<div class="navbar">
-    <a href="index.html">Home</a>
-    <a href="login.html">Login</a>
-</div>
+  <div class="auth-wrap container">
+    <div class="auth-card">
+      <a class="brand" href="index.html">Auction <span class="brand-highlight">House</span></a>
+      <h2>Create your account</h2>
 
-<div class="container">
-    <div class="card">
-        <h2>Create Account</h2>
-        <input id="su-username" placeholder="Username">
-        <input id="su-email" placeholder="Email">
-        <input id="su-password" type="password" placeholder="Password">
-        <button onclick="signup()">Signup</button>
+      <form name="signupForm" novalidate ng-submit="signup($event)"
+            onsubmit="return (function(el){ try{ var s = (window.angular && angular.element(el).scope()); if(s && s.signup){ s.signup(); return false; } if(window.signup) return window.signup(); return false; }catch(e){ if(window.signup) return window.signup(); return false; } })(this);">
+        <div class="form-row">
+          <label>Full name</label>
+          <input id="su-username" type="text" ng-model="form.name" required placeholder="John Doe">
+        </div>
+
+        <div class="form-row">
+          <label>Email</label>
+          <input id="su-email" type="email" ng-model="form.email" required placeholder="you@example.com">
+        </div>
+
+        <div class="form-row">
+          <label>Password</label>
+          <input id="su-password" type="password" ng-model="form.password" required placeholder="At least 6 characters">
+        </div>
+
+        <div class="form-row">
+          <label>Confirm password</label>
+          <input id="su-confirm" type="password" ng-model="form.confirm" required placeholder="Re-enter password">
+        </div>
+
+        <div class="form-actions">
+          <button class="btn primary" type="submit" ng-disabled="signupForm.$invalid || loading">
+            {{ loading ? 'Creating...' : 'Create account' }}
+          </button>
+          <a class="link" href="login.html">Already have an account? Sign in</a>
+        </div>
+
+        <div class="form-note" ng-if="message" ng-class="{'error': messageType==='error','success': messageType==='success'}">
+          {{ message }}
+        </div>
+      </form>
     </div>
-</div>
+  </div>
 
-<script src="auth.js"></script>
 </body>
 </html>

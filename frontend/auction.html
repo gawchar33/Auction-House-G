@@ -16,75 +16,62 @@
 
 <body ng-controller="AuctionController">
     <div class="navbar">
-    <div class="nav-left">
-        <div class="logo">Auction</div>
-        <a href="index.html">Home</a>
-        <a href="product.html">Products</a>
-        <a href="category.html">Categories</a>
-        <a href="customer.html">Customers</a>
+        <div class="nav-left">
+            <div class="logo">Auction</div>
+            <a href="index.html">Home</a>
+            <a href="product.html">Products</a>
+            <a href="category.html">Categories</a>
+            <a href="customer.html">Customers</a>
+        </div>
+        <div class="nav-right">
+            <a href="signup.html">Signup</a>
+            <a href="login.html">Login</a>
+        </div>
     </div>
 
-    <div class="nav-right">
-        <a href="signup.html">Signup</a>
-        <a href="login.html">Login</a>
+    <h1>Auction Management</h1>
+
+    <!-- ADD / EDIT AUCTION -->
+    <div class="card">
+        <h2>{{ editMode ? 'Edit Auction' : 'Add Auction' }}</h2>
+
+        <input type="text" ng-model="auction.title" placeholder="Auction Title">
+        <input type="text" ng-model="auction.description" placeholder="Description">
+        <input type="number" step="0.01" ng-model="auction.starting_price" placeholder="Starting Price">
+        <input type="number" step="0.01" ng-model="auction.current_price" placeholder="Current Price">
+        <input type="number" ng-model="auction.category" placeholder="Category ID">
+        <input type="number" ng-model="auction.seller" placeholder="Seller (User ID)">
+        <input type="datetime-local" ng-model="auction.end_time">
+
+        <label><input type="checkbox" ng-model="auction.is_active"> Active</label>
+
+        <br><br>
+
+        <button ng-if="!editMode" ng-click="createAuction()">Add</button>
+        <button ng-if="editMode" ng-click="updateAuction()">Update</button>
+        <button ng-if="editMode" ng-click="cancelEdit()">Cancel</button>
     </div>
-</div>
 
-
-<h1>Auction Management</h1>
-
-<!-- ADD / EDIT AUCTION -->
-<div class="card">
-    <h2>{{ editMode ? 'Edit Auction' : 'Add Auction' }}</h2>
-
-    <input type="text" ng-model="auction.title" placeholder="Auction Title">
-    <input type="text" ng-model="auction.description" placeholder="Description">
-    <input type="number" ng-model="auction.starting_price" placeholder="Starting Price">
-    <input type="number" ng-model="auction.current_price" placeholder="Current Price">
-    <input type="number" ng-model="auction.category" placeholder="Category ID">
-    <input type="number" ng-model="auction.seller" placeholder="Seller (User ID)">
-    <input type="datetime-local" ng-model="auction.end_time">
-
-    <label>
-        <input type="checkbox" ng-model="auction.is_active"> Active
-    </label>
-
-    <br><br>
-
-    <button ng-if="!editMode" ng-click="createAuction()">Add</button>
-    <button ng-if="editMode" ng-click="updateAuction()">Update</button>
-    <button ng-if="editMode" ng-click="cancelEdit()">Cancel</button>
-</div>
-
-<!-- AUCTION LIST -->
-<div class="card">
-    <h2>Auction List</h2>
-
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Seller</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-
-        <tr ng-repeat="a in auctions">
-            <td>{{a.id}}</td>
-            <td>{{a.title}}</td>
-            <td>{{a.current_price}}</td>
-            <td>{{a.category}}</td>
-            <td>{{a.seller}}</td>
-            <td>{{a.is_active ? 'Active' : 'Closed'}}</td>
-            <td>
-                <button ng-click="editAuction(a)">Edit</button>
-                <button class="delete" ng-click="deleteAuction(a.id)">Delete</button>
-            </td>
-        </tr>
-    </table>
-</div>
-
+    <!-- AUCTION LIST -->
+    <div class="card">
+        <h2>Auction List</h2>
+        <table>
+            <tr>
+                <th>ID</th><th>Title</th><th>Price</th><th>Category</th><th>Seller</th><th>Status</th><th>Actions</th>
+            </tr>
+            <tr ng-repeat="a in auctions">
+                <td>{{a.id}}</td>
+                <td>{{a.title}}</td>
+                <td>{{a.current_price}}</td>
+                <td>{{a.category}}</td>
+                <td>{{a.seller}}</td>
+                <td>{{a.is_active ? 'Active' : 'Closed'}}</td>
+                <td>
+                    <button ng-click="editAuction(a)">Edit</button>
+                    <button class="delete" ng-click="deleteAuction(a.id)">Delete</button>
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>

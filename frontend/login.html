@@ -1,46 +1,48 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html ng-app="auctionApp">
 <head>
-  <title>Login</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign in — Auction House</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
 </head>
-<body>
+<body ng-controller="AuthController" class="auth-fullscreen" ng-cloak>
 
-<h2>Login</h2>
+  <div class="auth-wrap container">
+    <div class="auth-card">
+      <a class="brand" href="index.html">Auction <span class="brand-highlight">House</span></a>
+      <h2>Welcome back</h2>
 
-<input id="username" placeholder="Username"><br><br>
-<input id="password" type="password" placeholder="Password"><br><br>
+      <form name="loginForm" novalidate ng-submit="login($event)"
+            onsubmit="return (function(el){ try{ var s = (window.angular && angular.element(el).scope()); if(s && s.login){ s.login(); return false; } if(window.login) return window.login(); return false; }catch(e){ if(window.login) return window.login(); return false; } })(this);">
+        <div class="form-row">
+          <label>Email or username</label>
+          <!-- provide both ids used by legacy helpers -->
+          <input id="li-username" type="text" ng-model="form.email" required placeholder="you@example.com or username">
+          <input id="li-email" type="hidden" />
+        </div>
 
-<button onclick="login()">Login</button>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="li-password" type="password" ng-model="form.password" required placeholder="Your password">
+        </div>
 
-<script>
-function login() {
-  fetch("http://127.0.0.1:8000/auth/login/", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      username: username.value,
-      password: password.value
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    console.log("LOGIN RESPONSE:", data);
+        <div class="form-actions">
+          <button class="btn primary" type="submit" ng-disabled="loginForm.$invalid || loading">
+            {{ loading ? 'Signing in...' : 'Sign in' }}
+          </button>
+          <a class="link" href="signup.html">Create account</a>
+        </div>
 
-    if (!data.user_id) {
-      alert("Login failed");
-      return;
-    }
-
-    // ✅ THIS IS THE MOST IMPORTANT PART
-    localStorage.setItem("user_id", data.user_id);
-    localStorage.setItem("username", data.username);
-    localStorage.setItem("email", data.email);
-
-    alert("Login successful");
-    window.location.href = "index.html";
-  });
-}
-</script>
+        <div class="form-note" ng-if="message" ng-class="{'error': messageType==='error','success': messageType==='success'}">
+          {{ message }}
+        </div>
+      </form>
+    </div>
+  </div>
 
 </body>
 </html>

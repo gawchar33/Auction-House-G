@@ -1,34 +1,40 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html ng-app="auctionApp">
 <head>
-    <title>Categories</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Categories — Auction House</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="app.js"></script>
+  <script src="auth.js"></script>
+  <script src="category.js"></script>
 </head>
-<body>
+<body ng-controller="CategoryController" ng-cloak>
+  <div ng-include="'navbar.html'"></div>
 
-<div class="navbar">
-    <div class="logo">Auction</div>
-    <div>
-        <a href="index.html">Home</a>
-        <a href="product.html">Products</a>
-    </div>
-</div>
+  <main class="container main-wrap">
+    <section class="categories" aria-label="Categories" style="margin-top:18px">
+      <div class="section-head">
+        <h2 class="page-title">Categories</h2>
+      </div>
 
-<div class="container">
-    <div class="card">
-        <h1>Add Category</h1>
-        <input type="text" placeholder="Category Name">
-        <input type="text" placeholder="Description">
-        <button>Add Category</button>
+      <div class="grid category-grid" ng-if="categories.length">
+        <div class="card category-card" ng-repeat="c in categories">
+          <div class="card-body">
+            <h3>{{ c.name || c.title || c.slug }}</h3>
+            <p class="meta" ng-if="c.description">{{ c.description }}</p>
+            <div style="margin-top:10px">
+              <a class="btn small" href="product.html?cat={{ c.slug || c.name }}">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <h2>Category List</h2>
-        <table>
-            <tr>
-                <th>ID</th><th>Name</th><th>Description</th>
-            </tr>
-        </table>
-    </div>
-</div>
-
+      <div ng-if="!categories.length && !loading" class="muted" style="margin-top:18px">No categories found.</div>
+      <div ng-if="loading" class="muted" style="margin-top:18px">Loading categories…</div>
+      <div ng-if="error" class="form-note error" style="margin-top:18px">{{ error }}</div>
+    </section>
+  </main>
 </body>
 </html>

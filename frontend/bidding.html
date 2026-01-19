@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" ng-app="biddingApp">
+<head>
+  <meta charset="utf-8" />
+  <title>Bidding</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="bidding.js"></script>
+</head>
+<body ng-controller="BiddingController">
+
+  <h1>Bids</h1>
+
+  <div class="card">
+    <h2>{{ bid.id ? 'Edit Bid' : 'Create Bid' }}</h2>
+
+    <input type="number" ng-model="bid.product" placeholder="Product ID">
+    <input type="number" ng-model="bid.customer" placeholder="Customer ID">
+    <input type="number" step="0.01" ng-model="bid.amount" placeholder="Amount">
+
+    <button ng-click="saveBid()">{{ bid.id ? 'Update' : 'Create' }}</button>
+    <button class="cancel" ng-if="bid.id" ng-click="cancelEdit()">Cancel</button>
+  </div>
+
+  <div class="card">
+    <h2>Bid List</h2>
+    <table>
+      <tr><th>ID</th><th>Product</th><th>Customer</th><th>Amount</th><th>Action</th></tr>
+      <tr ng-repeat="b in bids">
+        <td>{{ b.id }}</td>
+        <td>{{ b.product }}</td>
+        <td>{{ b.customer }}</td>
+        <td>{{ b.amount | number:2 }}</td>
+        <td>
+          <button ng-click="editBid(b)">Edit</button>
+          <button class="delete" ng-click="deleteBid(b.id)">Delete</button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</body>
+</html>

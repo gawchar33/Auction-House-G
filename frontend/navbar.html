@@ -1,0 +1,49 @@
+<nav class="site-nav" ng-controller="NavController" ng-cloak aria-label="Main navigation">
+  <div class="nav-inner container">
+    <a class="brand" href="index.html" aria-label="Auction House">
+      <!-- hammer icon -->
+      <svg class="brand-icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M21.7 13.35l-3.05-3.05c.2-.56.06-1.21-.42-1.69l-1.54-1.54c-.79-.79-2.07-.79-2.86 0L9.9 8.24 7.76 6.1 6.36 7.5l2.14 2.14-3.29 3.3c-.39.39-.39 1.02 0 1.41l2.12 2.12c.39.39 1.02.39 1.41 0l3.3-3.29 2.14 2.14 1.41-1.41-2.14-2.14 3.4-3.41c.48-.48 1.13-.63 1.69-.42z"/>
+      </svg>
+      <span class="brand-text">Auction House</span>
+    </a>
+
+    <button class="nav-toggle" aria-label="Toggle menu" ng-click="navOpen = !navOpen">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
+    <ul class="nav-menu" ng-class="{'open': navOpen}">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="category.html">Categories</a></li>
+      <li><a href="product.html">Products</a></li>
+      <li><a href="auction.html">Auctions</a></li>
+      <li><a href="customers.html">Customers</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <div class="action-links" ng-show="!isAuthenticated">
+        <a class="link" href="login.html">Login</a>
+        <a class="btn small" href="signup.html">Sign Up</a>
+      </div>
+
+      <div class="action-user" ng-show="isAuthenticated">
+        <button class="avatar-btn" ng-click="toggleUserMenu($event)" aria-haspopup="true" aria-expanded="{{userMenu}}">
+          <span class="avatar" ng-if="user.profile_photo">
+            <img ng-src="{{ user.profile_photo }}" alt="avatar" />
+          </span>
+          <span class="avatar" ng-if="!user.profile_photo">
+            {{ (user.first_name || user.username || 'U').charAt(0).toUpperCase() }}
+          </span>
+          <span class="name">{{ user.first_name || user.username }}</span>
+          <svg class="chev" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+        </button>
+
+        <ul class="avatar-menu" ng-class="{'open': userMenu}" ng-click="$event.stopPropagation()">
+          <li><a href="#" ng-click="goProfile($event)">Profile</a></li>
+          <li><a href="orders.html">My Bids</a></li>
+          <li class="sep"><a href="#" ng-click="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
