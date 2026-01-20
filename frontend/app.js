@@ -11,31 +11,6 @@ angular.module('auctionApp', [])
   $http.get(window.BACKEND + '/user/csrf/', { withCredentials: true }).catch(function(){});
 }])
 
-.controller('NavController', ['$scope','$http', function($scope,$http){
-  $scope.isAuthenticated = !!window.localStorage.getItem('auth');
-  $scope.user = {};
-  $scope.toggleMenu = false;
-
-  $scope.loadUser = function(){
-    if(!$scope.isAuthenticated) return;
-    $http.get(window.BACKEND + '/user/profile/', { withCredentials: true })
-      .then(function(resp){ $scope.user = resp.data || {}; })
-      .catch(function(){ $scope.user = {}; });
-  };
-
-  $scope.logout = function(){
-    $http.post(window.BACKEND + '/user/logout/', {}, { withCredentials: true })
-      .finally(function(){
-        window.localStorage.removeItem('auth');
-        $scope.isAuthenticated = false;
-        $scope.user = {};
-        window.location.href = 'index.html';
-      });
-  };
-
-  $scope.loadUser();
-}])
-
 .controller('HomeController', ['$scope', function($scope){
   $scope.year = new Date().getFullYear();
   $scope.categories = [

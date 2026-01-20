@@ -16,8 +16,7 @@
       <a class="brand" href="index.html">Auction <span class="brand-highlight">House</span></a>
       <h2>Create your account</h2>
 
-      <form name="signupForm" novalidate ng-submit="signup($event)"
-            onsubmit="return (function(el){ try{ var s = (window.angular && angular.element(el).scope()); if(s && s.signup){ s.signup(); return false; } if(window.signup) return window.signup(); return false; }catch(e){ if(window.signup) return window.signup(); return false; } })(this);">
+      <form name="signupForm" novalidate ng-submit="signup($event)">
         <div class="form-row">
           <label>Full name</label>
           <input id="su-username" type="text" ng-model="form.name" required placeholder="John Doe">

@@ -15,7 +15,7 @@
 <body ng-controller="ProductController">
 
   <div class="customer-wrapper">
-    <div class="form-card">
+    <div class="form-card" ng-if="!categoryFilter">
       <h1 class="card-title">Add Product</h1>
 
       <form name="prodForm" ng-submit="editMode ? updateProduct() : createProduct()" novalidate enctype="multipart/form-data">
@@ -96,8 +96,9 @@
                 <button class="btn danger small" ng-click="deleteProduct(p.id)">Delete</button>
               </td>
             </tr>
-            <tr ng-if="!products.length">
-              <td colspan="7" class="empty">No products found.</td>
+            <tr ng-if="!loading && !products.length && !error">
+              <td colspan="7" class="muted" ng-if="!categoryFilter">No products found.</td>
+              <td colspan="7" class="muted" ng-if="categoryFilter">No products found in category "{{ categoryFilter }}".</td>
             </tr>
           </tbody>
         </table>
@@ -105,5 +106,67 @@
     </div>
   </div>
 
+  <script>
+    angular.module('auctionApp').controller('ProductController', ['$scope','$http','$window', function($scope,$http,$window){
+      $scope.products = [];
+      $scope.loading = false;
+      $scope.error = '';
+
+      // read category filter from URL (supports ?category=, ?name=, ?slug=)
+      try {
+        var _q = new URLSearchParams(window.location.search || '');
+        $scope.categoryFilter = (_q.get('category') || _q.get('name') || _q.get('slug') || '').trim();
+      } catch (e) {
+        $scope.categoryFilter = '';
+      }
+      console.log('Product page search=', window.location.search, 'categoryFilter=', $scope.categoryFilter);
+
+      var API = (window.BACKEND || 'http://127.0.0.1:8000').replace(/\/$/,'') + '/product/';
+
+      function normalize(data){
+        if(!data) return [];
+        if(Array.isArray(data)) return data;
+        if(data.results && Array.isArray(data.results)) return data.results;
+        return data.data || [];
+      }
+
+      $scope.load = function(){
+        $scope.loading = true;
+        $scope.error = '';
+        $http.get(API, { withCredentials: true })
+          .then(function(resp){
+            $scope.products = normalize(resp.data);
+
+            // if a category filter is present, keep only matching products
+            if($scope.categoryFilter){
+              var f = ($scope.categoryFilter || '').toLowerCase();
+              $scope.products = $scope.products.filter(function(p){
+                if(!p) return false;
+                // support shapes: p.category (string), p.category.slug, p.category.name, p.cat, p.category_slug
+                var cat = (p.category && (p.category.slug || p.category.name || p.category)) || p.cat || p.category_slug || '';
+                return (''+cat).toLowerCase().indexOf(f) !== -1;
+              });
+            }
+
+            $scope.loading = false;
+          })
+          .catch(function(err){
+            $scope.loading = false;
+            $scope.error = (err.data && (err.data.detail || err.data.error)) || ('Failed to load products (' + (err.status || 'network') + ')');
+            $scope.products = [];
+            console.warn('Load products failed', err);
+          });
+      };
+
+      $scope.delete = function(id){
+        if(!confirm('Delete product?')) return;
+        $http.delete(API + id + '/', { withCredentials: true })
+          .then(function(){ $scope.load(); })
+          .catch(function(err){ alert('Delete failed'); console.error(err); });
+      };
+
+      $scope.load();
+    }]);
+  </script>
 </body>
 </html>

@@ -1,97 +1,102 @@
 <!doctype html>
 <html ng-app="auctionApp">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Profile — Auction House</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // indicate navbar should be hidden on this page
+    window.HIDE_NAV = true;
+  </script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
   <script src="profile.js"></script>
 </head>
-<body ng-controller="ProfileController" class="auth-fullscreen">
-  <main class="auth-wrap card profile-wrap">
-    <div class="profile-card container-lg elevated">
-      <div class="profile-header">
-        <h2>Your profile</h2>
-        <div class="actions">
-          <!-- prominent edit button -->
-          <button class="btn gradient accent" ng-click="toggleEdit()" ng-if="!edit">Edit profile</button>
-          <button class="btn outline" ng-click="toggleEdit()" ng-if="edit">Cancel</button>
+<body ng-controller="ProfileController" ng-cloak>
+
+  <div ng-include="'navbar.html'"></div>
+
+  <main class="container main-wrap">
+    <section class="profile-section">
+      <div class="profile-card">
+
+        <!-- header -->
+        <header class="profile-head">
+          <h1>My Profile</h1>
+          <p class="muted">View or edit your account details. Click Edit to update.</p>
+        </header>
+
+        <!-- READ VIEW -->
+        <div class="profile-read" ng-if="!editing">
+          <div class="profile-grid">
+            <div class="left-col">
+              <div class="photo-preview">
+                <img ng-src="{{ user.image || user.avatar_base64 || user.profile_photo || 'assets/no-avatar.svg' }}" alt="avatar" />
+              </div>
+            </div>
+
+            <div class="right-col">
+              <div class="info-row"><strong>First name:</strong> <span>{{ user.first_name || '-' }}</span></div>
+              <div class="info-row"><strong>Last name:</strong> <span>{{ user.last_name || '-' }}</span></div>
+              <div class="info-row"><strong>Email:</strong> <span>{{ user.email || '-' }}</span></div>
+              <div class="info-row"><strong>Phone:</strong> <span>{{ user.phone || '-' }}</span></div>
+              <div class="info-row"><strong>Address:</strong> <span>{{ user.address || '-' }}</span></div>
+
+              <div class="form-actions" style="margin-top:12px;">
+                <button class="btn primary" ng-click="startEdit()">Edit Profile</button>
+                <a class="btn ghost btn-back" href="index.html">Back to Home</a>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <section class="profile-grid">
-        <aside class="profile-side">
-          <div class="avatar-box">
-            <img ng-src="{{ preview || defaultAvatar }}" alt="avatar" class="avatar-large" />
-            <label class="photo-btn" ng-if="edit">
-              Change photo
-              <input type="file" accept="image/*" onchange="angular.element(this).scope().onFileChange(this.files)" />
-            </label>
-          </div>
-
-          <div class="profile-basic">
-            <h3 class="profile-name">{{ form.name || '—' }}</h3>
-            <!-- email removed from the side summary as requested -->
-            <div class="muted" ng-if="form.phone">{{ form.phone }}</div>
-          </div>
-        </aside>
-
-        <div class="profile-main">
-          <!-- VIEW MODE -->
-          <div ng-if="!edit" class="profile-view card-light">
-            <h4>Details</h4>
-            <div class="view-row"><strong>Name</strong><span>{{ form.name || '—' }}</span></div>
-            <div class="view-row"><strong>Email</strong><span>{{ form.email || '—' }}</span></div>
-            <div class="view-row"><strong>Phone</strong><span>{{ form.phone || '—' }}</span></div>
-            <div class="view-row"><strong>Address</strong><span>{{ form.address || '—' }}</span></div>
-          </div>
-
-          <!-- EDIT MODE -->
-          <form ng-if="edit" name="profileForm" novalidate ng-submit="save($event)" class="profile-form card-light">
-            <div class="form-row">
-              <label>Full name</label>
-              <input type="text" ng-model="form.name" placeholder="First Last" class="input" required />
-            </div>
-
-            <div class="form-row">
-              <label>Email</label>
-              <input type="email" ng-model="form.email" placeholder="you@example.com" class="input" required />
-            </div>
-
-            <div class="form-row inline">
-              <div style="flex:1">
-                <label>Phone</label>
-                <input type="tel" ng-model="form.phone" placeholder="+1 555 555 5555" class="input" />
+        <!-- EDIT FORM -->
+        <form name="profileForm" class="profile-form" ng-submit="save()" ng-if="editing" novalidate>
+          <div class="profile-grid">
+            <div class="left-col">
+              <label>Profile photo</label>
+              <div class="photo-row">
+                <div class="photo-preview">
+                  <img id="photoPreview" ng-src="{{ user.image || user.avatar_base64 || user.profile_photo || 'assets/no-avatar.svg' }}" alt="avatar"/>
+                </div>
+                <div class="photo-actions">
+                  <input id="photoInput" type="file" accept="image/*" onchange="angular.element(this).scope().onFileChange(this)" />
+                  <small class="muted">PNG/JPG, max 2MB</small>
+                </div>
               </div>
-              <div style="flex:1;align-self:flex-end">
-                <label>Photo</label>
-                <label class="photo-btn small">
-                  Choose...
-                  <input type="file" accept="image/*" onchange="angular.element(this).scope().onFileChange(this.files)" />
-                </label>
-              </div>
+
+              <label>First name</label>
+              <input type="text" ng-model="user.first_name" placeholder="First name" required />
+
+              <label>Last name</label>
+              <input type="text" ng-model="user.last_name" placeholder="Last name" />
+
+              <label>Phone</label>
+              <input type="tel" ng-model="user.phone" placeholder="+1 555 555 5555" />
             </div>
 
-            <div class="form-row">
+            <div class="right-col">
               <label>Address</label>
-              <textarea ng-model="form.address" placeholder="Street, City, Country" rows="3" class="input"></textarea>
-            </div>
+              <input type="text" ng-model="user.address" placeholder="Street, City, Country" />
 
-            <div class="form-actions">
-              <button class="btn gradient" type="submit" ng-disabled="saving">{{ saving ? 'Saving...' : 'Save profile' }}</button>
-              <a class="link muted" href="index.html">Back to home</a>
-            </div>
+              <label>Email</label>
+              <input type="email" ng-model="user.email" placeholder="you@example.com" required />
 
-            <div class="form-note" ng-if="message" ng-class="{'error': messageType==='error','success': messageType==='success'}">
-              {{ message }}
+              <div class="form-actions stacked" style="margin-top:14px;">
+                <button type="submit" class="btn primary" ng-disabled="saving">Save changes</button>
+                <button type="button" class="btn ghost" ng-click="cancelEdit()">Cancel</button>
+                <a class="btn ghost btn-back" href="index.html">Back to Home</a>
+                <span class="status" ng-if="message">{{ message }}</span>
+              </div>
             </div>
-          </form>
-        </div>
-      </section>
-    </div>
+          </div>
+        </form>
+
+      </div>
+    </section>
   </main>
+
 </body>
 </html>

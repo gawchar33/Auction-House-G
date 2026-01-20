@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("customer", "0003_alter_customer_email"),
+        ("customer", "0004_initial"),
         ("product", "0001_initial"),
     ]
 

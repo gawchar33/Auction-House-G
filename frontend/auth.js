@@ -15,7 +15,13 @@ function signup() {
 
   try {
     var user = { username: username, email: email, password: password };
-    window.localStorage.setItem('user', JSON.stringify(user));
+    // save into local_users list for fallback logins
+    try {
+      var users = JSON.parse(window.localStorage.getItem('local_users') || '[]');
+      users = users.filter(function(u){ return !((u.email && user.email && u.email === user.email) || (u.username && user.username && u.username === user.username)); });
+      users.push(user);
+      window.localStorage.setItem('local_users', JSON.stringify(users));
+    } catch(e){ console.error('[AUTH] legacy signup local save failed', e); }
     console.log('[AUTH] signup saved locally', user);
   } catch (e) {
     console.error('[AUTH] signup storage error', e);
@@ -139,7 +145,7 @@ function checkLogin() {
         return;
       }
 
-      var payload = { username: name, email: email, password: password };
+      var payload = { name: name, email: email, password: password };
 
       // Try backend first, fall back to local storage
       $http.post((window.BACKEND || 'http://127.0.0.1:8000') + '/user/signup/', payload, jsonCfg())
@@ -149,19 +155,24 @@ function checkLogin() {
             saveLocalUser(saved);
             if (saved.id) window.localStorage.setItem('user_id', String(saved.id));
           } catch (e) { console.error('[AUTH] signup save error', e); }
+          // ensure we do not leave previous auth/user set — clear auth and visible user so nav shows login
+          try { window.localStorage.removeItem('auth'); window.localStorage.removeItem('user'); window.dispatchEvent(new Event('user-updated')); } catch(e){}
           $scope.loading = false;
           $scope.message = 'Signup successful. Redirecting to login...';
           $scope.messageType = 'success';
-          setTimeout(function () { try { $window.location.replace('login.html'); } catch (e) { window.location.href = 'login.html'; } }, 700);
+          // redirect immediately to login page
+          try { $window.location.replace('login.html'); } catch (e) { window.location.href = 'login.html'; }
         })
         .catch(function (err) {
           console.warn('[AUTH] signup failed, saving locally', err && (err.status || err.message));
-          // store locally so multiple signups are preserved
           try { saveLocalUser(payload); } catch (e) { console.error('[AUTH] local save error', e); }
+          // clear any previous login state so site shows login (not another user's profile)
+          try { window.localStorage.removeItem('auth'); window.localStorage.removeItem('user'); window.dispatchEvent(new Event('user-updated')); } catch(e){}
           $scope.loading = false;
           $scope.message = 'Signup saved locally. Redirecting to login...';
           $scope.messageType = 'success';
-          setTimeout(function () { try { $window.location.replace('login.html'); } catch (e) { window.location.href = 'login.html'; } }, 700);
+          // redirect immediately to login page even if server failed
+          try { $window.location.replace('login.html'); } catch (e) { window.location.href = 'login.html'; }
         });
     };
 
@@ -186,16 +197,28 @@ function checkLogin() {
         .then(function (resp) {
           $scope.loading = false;
           try {
-            var userToStore = (resp.data && Object.keys(resp.data).length) ? resp.data : payload;
-            window.localStorage.setItem('auth', '1');
-            window.localStorage.setItem('user', JSON.stringify(userToStore));
-            if (userToStore.id) window.localStorage.setItem('user_id', String(userToStore.id));
-            // notify other controllers/pages
-            try { window.dispatchEvent(new Event('user-updated')); } catch (e) {}
+            // after login, fetch full profile from server and cache it
+            $http.get((window.BACKEND || 'http://127.0.0.1:8000') + '/user/profile/', { withCredentials: true })
+              .then(function(profileResp){
+                try {
+                  var profile = profileResp.data || {};
+                  window.localStorage.setItem('auth', '1');
+                  window.localStorage.setItem('user', JSON.stringify(profile));
+                  if (profile.id) window.localStorage.setItem('user_id', String(profile.id));
+                  try { window.dispatchEvent(new Event('user-updated')); } catch (e) {}
+                } catch(e){ console.error('[AUTH] profile store error', e); }
+                $scope.message = 'Login successful. Redirecting...';
+                $scope.messageType = 'success';
+                try { $window.location.replace('index.html'); } catch (e) { window.location.href = 'index.html'; }
+              })
+              .catch(function(){
+                // if profile fetch fails, still set minimal auth flag and redirect
+                try { window.localStorage.setItem('auth', '1'); } catch(e){}
+                $scope.message = 'Login successful. Redirecting...';
+                $scope.messageType = 'success';
+                try { $window.location.replace('index.html'); } catch (e) { window.location.href = 'index.html'; }
+              });
           } catch (e) { console.error('[AUTH] login save error', e); }
-          $scope.message = 'Login successful. Redirecting...';
-          $scope.messageType = 'success';
-          try { $window.location.replace('index.html'); } catch (e) { window.location.href = 'index.html'; }
         })
         .catch(function (err) {
           console.warn('[AUTH] login failed, trying local users', err && (err.status || err.message));
@@ -223,8 +246,8 @@ function checkLogin() {
 
     // expose global wrappers for legacy forms (keeps onsubmit handlers working)
     try {
-      window.signup = function () { try { return (typeof $scope.signup === 'function') ? $scope.signup() : false; } catch (e) { console.error('[AUTH] global signup wrapper error', e); return false; } };
-      window.login = function () { try { return (typeof $scope.login === 'function') ? $scope.login() : false; } catch (e) { console.error('[AUTH] global login wrapper error', e); return false; } };
+      window.signup = function () { try { if (typeof $scope.signup === 'function') { $scope.signup(); } return false; } catch (e) { console.error('[AUTH] global signup wrapper error', e); return false; } };
+      window.login = function () { try { if (typeof $scope.login === 'function') { $scope.login(); } return false; } catch (e) { console.error('[AUTH] global login wrapper error', e); return false; } };
     } catch (e) { console.error('[AUTH] expose globals failed', e); }
   }]);
 
@@ -234,6 +257,7 @@ function checkLogin() {
     $scope.userMenu = false;
     $scope.isAuthenticated = false;
     $scope.user = {};
+    $scope.hideNav = !!(window.HIDE_NAV);
 
     // read cached user on init so Govind shows up immediately after local login/signup
     try {

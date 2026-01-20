@@ -25,7 +25,7 @@
             <h3>{{ c.name || c.title || c.slug }}</h3>
             <p class="meta" ng-if="c.description">{{ c.description }}</p>
             <div style="margin-top:10px">
-              <a class="btn small" href="product.html?cat={{ c.slug || c.name }}">View</a>
+              <a class="view-btn" ng-href="product.html?category={{ (c.slug || c.name) }}">View</a>
             </div>
           </div>
         </div>

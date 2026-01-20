@@ -1,4 +1,4 @@
-<nav class="site-nav" ng-controller="NavController" ng-cloak aria-label="Main navigation">
+<nav class="site-nav" ng-controller="NavController" ng-cloak aria-label="Main navigation" ng-show="!hideNav">
   <div class="nav-inner container">
     <a class="brand" href="index.html" aria-label="Auction House">
       <!-- hammer icon -->
@@ -39,7 +39,7 @@
         </button>
 
         <ul class="avatar-menu" ng-class="{'open': userMenu}" ng-click="$event.stopPropagation()">
-          <li><a href="#" ng-click="goProfile($event)">Profile</a></li>
+          <li><a href="profile.html">Profile</a></li>
           <li><a href="orders.html">My Bids</a></li>
           <li class="sep"><a href="#" ng-click="logout()">Logout</a></li>
         </ul>

@@ -6,6 +6,8 @@ from django.db import IntegrityError
 from django.utils.crypto import get_random_string
 import json
 
+from customer.models import Customer
+
 User = get_user_model()
 
 @ensure_csrf_cookie
@@ -49,7 +51,13 @@ def signup(request):
             last_name=last_name
         )
 
-        return JsonResponse({'detail': 'user created', 'username': user.username, 'email': user.email}, status=201)
+        # ensure a Customer row exists for this user
+        try:
+            Customer.objects.get_or_create(user=user)
+        except Exception:
+            pass
+
+        return JsonResponse({'detail': 'user created', 'id': user.id, 'username': user.username, 'email': user.email}, status=201)
 
     except IntegrityError:
         return JsonResponse({'error': 'user with that email or username already exists'}, status=400)
@@ -81,17 +89,17 @@ def login(request):
                 user = authenticate(request, username=user_obj.username, password=password)
                 if user:
                     django_login(request, user)
-                    return JsonResponse({'detail': 'logged in', 'username': user.username}, status=200)
+                    return JsonResponse({'detail': 'logged in', 'id': user.id, 'username': user.username, 'first_name': user.first_name, 'email': user.email}, status=200)
                 # explicit check_password fallback (covers manually created hashes)
                 if user_obj.check_password(password):
                     django_login(request, user_obj)
-                    return JsonResponse({'detail': 'logged in', 'username': user_obj.username}, status=200)
+                    return JsonResponse({'detail': 'logged in', 'id': user_obj.id, 'username': user_obj.username, 'first_name': user_obj.first_name, 'email': user_obj.email}, status=200)
 
         # Fallback: treat identifier as username
         user = authenticate(request, username=identifier, password=password)
         if user:
             django_login(request, user)
-            return JsonResponse({'detail': 'logged in', 'username': user.username}, status=200)
+            return JsonResponse({'detail': 'logged in', 'id': user.id, 'username': user.username, 'first_name': user.first_name, 'email': user.email}, status=200)
 
         return JsonResponse({'error': 'invalid credentials'}, status=400)
     except Exception as e:
@@ -113,7 +121,16 @@ def profile(request):
     try:
         cust = getattr(user, 'customer', None)
         if cust:
-            data['customer'] = {'id': getattr(cust, 'id', None), 'phone': getattr(cust, 'phone', None)}
+            # normalize avatar_base64: strip optional 'username:' prefix before returning
+            raw_avatar = getattr(cust, 'avatar_base64', None)
+            if raw_avatar and isinstance(raw_avatar, str) and ':' in raw_avatar:
+                # assume format 'username:base64'
+                raw_avatar = raw_avatar.split(':', 1)[1]
+            data['customer'] = {'id': getattr(cust, 'id', None), 'phone': getattr(cust, 'phone', None), 'address': getattr(cust, 'address', None), 'avatar_base64': raw_avatar}
+            # also expose phone/address/avatar at top level for older frontend
+            data['phone'] = getattr(cust, 'phone', None)
+            data['address'] = getattr(cust, 'address', None)
+            data['avatar_base64'] = raw_avatar
     except Exception:
         pass
     return JsonResponse(data)

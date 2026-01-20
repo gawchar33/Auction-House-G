@@ -9,7 +9,7 @@
   <script src="app.js"></script>
   <script src="auth.js"></script>
 </head>
-<body ng-controller="HomeController" ng-cloak>
+<body ng-controller="HomeController">
 
   <!-- NAVBAR -->
   <nav class="site-nav" ng-controller="NavController" aria-label="Main navigation">
@@ -23,6 +23,7 @@
         <li><a href="category.html">Categories</a></li>
         <li><a href="product.html">Products</a></li>
         <li><a href="auction.html">Auctions</a></li>
+        <li><a href="bidding.html">Bidding</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -35,10 +36,14 @@
           <a class="btn small" href="signup.html">Sign Up</a>
         </div>
 
-        <!-- profile button appears after login (NavController manages isAuthenticated/user) -->
         <div class="action-user" ng-show="isAuthenticated">
           <button class="avatar-btn" ng-click="toggleUserMenu($event)" aria-expanded="{{userMenu}}">
-            <span class="name">{{ user.first_name || user.username || 'Divya' }}</span>
+            <span class="avatar-badge" ng-bind="(user.first_name || user.username || user.name || 'U').substring(0,1) | uppercase"></span>
+            <div class="user-meta">
+              <span class="name">{{ user.first_name || user.username || user.name || 'User' }}</span>
+              <small class="role" ng-if="user.role">{{ user.role }}</small>
+            </div>
+            <span class="caret">▾</span>
           </button>
           <ul class="avatar-menu" ng-class="{'open': userMenu}" ng-click="$event.stopPropagation()">
             <li><a href="#" ng-click="goProfile()">Profile</a></li>
@@ -67,23 +72,41 @@
         </div>
       </div>
 
-      <div class="grid product-grid" ng-init="products = [
-        {id:1,name:'Vintage Camera',image:'https://picsum.photos/seed/p1/600/400',base:120,current:180,cat:'Electronics'},
-        {id:2,name:'Antique Vase',image:'https://picsum.photos/seed/p2/600/400',base:350,current:420,cat:'Collectibles'},
-        {id:3,name:'Signed Poster',image:'https://picsum.photos/seed/p3/600/400',base:40,current:60,cat:'Collectibles'},
-        {id:4,name:'Designer Watch',image:'https://picsum.photos/seed/p4/600/400',base:520,current:640,cat:'Accessories'},
-        {id:5,name:'Classic Radio',image:'https://picsum.photos/seed/p5/600/400',base:80,current:110,cat:'Electronics'},
-        {id:6,name:'Oil Painting',image:'https://picsum.photos/seed/p6/600/400',base:240,current:300,cat:'Art'}
-      ]">
-        <div class="card product-card" ng-repeat="p in products | filter:searchFilter">
-          <img ng-src="{{p.image}}" alt="{{p.name}}">
-          <div class="card-body">
-            <h3>{{p.name}}</h3>
-            <div class="meta"><strong>Base</strong> ${{p.base}} • <strong>Current</strong> ${{p.current}}</div>
-            <div class="card-actions">
-              <button class="btn primary" ng-click="placeBid(p)">Bid</button>
-              <a class="link" href="product.html?id={{p.id}}">View</a>
-            </div>
+      <div class="grid product-grid">
+        <div class="products-row">
+          <div class="card product-card">
+            <img src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?auto=format&fit=crop&w=600&q=60" alt="Luxury Chronograph Watch" />
+            <div class="card-body"><h3>Luxury Chronograph Watch</h3><div class="meta"><strong>Base</strong> $520 • <strong>Current</strong> $640</div></div>
+          </div>
+
+          <div class="card product-card" data-category="Shoes" data-stock="12" data-desc="Premium sports shoes with air cushioning, size 9, brand new.">
+            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=60" alt="Nike Air Max" />
+            <div class="card-body"><h3>Nike Air Max</h3><div class="meta"><strong>Base</strong> $5,000.00 • <strong>Current</strong> $5,000.00</div></div>
+          </div>
+
+          <div class="card product-card">
+            <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=60" alt="Dell Inspiron 15" />
+            <div class="card-body"><h3>Dell Inspiron 15</h3><div class="meta"><strong>Base</strong> $35,000.00 • <strong>Current</strong> $35,000.00</div></div>
+          </div>
+
+          <div class="card product-card">
+            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=60" alt="Flagship Smartphone" />
+            <div class="card-body"><h3>Flagship Smartphone</h3><div class="meta"><strong>Base</strong> $699 • <strong>Current</strong> $850</div></div>
+          </div>
+
+          <div class="card product-card">
+            <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=60" alt="Ultrabook Laptop" />
+            <div class="card-body"><h3>Ultrabook Laptop</h3><div class="meta"><strong>Base</strong> $999 • <strong>Current</strong> $1150</div></div>
+          </div>
+
+          <div class="card product-card">
+            <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=60" alt="Smart LED TV 55&quot;" />
+            <div class="card-body"><h3>Smart LED TV 55"</h3><div class="meta"><strong>Base</strong> $450 • <strong>Current</strong> $580</div></div>
+          </div>
+
+          <div class="card product-card">
+            <img src="https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=600&q=60" alt="Contemporary Oil Painting" />
+            <div class="card-body"><h3>Contemporary Oil Painting</h3><div class="meta"><strong>Base</strong> $240 • <strong>Current</strong> $300</div></div>
           </div>
         </div>
       </div>
@@ -106,9 +129,13 @@
       // load categories from backend (expects 3 categories to be added there)
       $scope.categories = [];
       try {
-        var endpoint = (window.BACKEND || 'http://127.0.0.1:8000') + '/categories/';
+        var endpoint = (window.BACKEND || 'http://127.0.0.1:8000') + '/category/';
         $http.get(endpoint, { withCredentials: true })
-          .then(function(res){ $scope.categories = res.data || []; })
+          .then(function(res){
+            var d = res.data || {};
+            // use array if returned directly, otherwise prefer paginated results
+            $scope.categories = Array.isArray(d) ? d : (Array.isArray(d.results) ? d.results : []);
+          })
           .catch(function(err){
             console.warn('[HOME] categories load failed', err && (err.status || err.message));
             $scope.categories = [];
@@ -134,3 +161,4 @@
 
 </body>
 </html>
+
