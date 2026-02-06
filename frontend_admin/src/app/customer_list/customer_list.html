@@ -1,0 +1,71 @@
+<div class="table-header">
+  <div>
+    <h2>Customers</h2>
+    <p class="table-subtitle">Manage all customers and profiles.</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn" (click)="toggleAdd($event)" [disabled]="inflight">Add Customer</button>
+    <button class="btn" (click)="loadCustomers($event)" [disabled]="inflight">Refresh</button>
+  </div>
+</div>
+
+<div class="status" *ngIf="loading">Loading customers…</div>
+<div class="status error" *ngIf="error">{{ error }}</div>
+
+<!-- Inline Add Form -->
+<div class="inline-add" *ngIf="showAdd" style="margin:12px 0;padding:12px;border:1px solid #e6e9ef;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="Username or Email" [(ngModel)]="addUser" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Phone" [(ngModel)]="addPhone" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Address" [(ngModel)]="addAddress" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:240px;" />
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitAdd($event)" [disabled]="inflight">Create</button>
+      <button class="btn" (click)="toggleAdd($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="addError" style="margin-top:8px;">{{ addError }}</div>
+</div>
+
+<div class="table-wrap" *ngIf="!loading && !error">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of customers">
+        <td>{{ customer.id }}</td>
+        <td>{{ customer.user?.username || customer.user?.email || customer.user }}</td>
+        <td>{{ customer.phone }}</td>
+        <td>{{ customer.address }}</td>
+        <td>{{ customer.created_at | date: 'medium' }}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" (click)="startEdit(customer,$event)" [disabled]="inflight">Edit</button>
+            <button class="btn danger" (click)="deleteItem(customer,$event)" [disabled]="inflight">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Inline Edit Form -->
+<div class="inline-add" *ngIf="editing" style="margin-top:12px;padding:12px;border:1px solid #fee2e2;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="User (id or username)" [(ngModel)]="editModel.user" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Phone" [(ngModel)]="editModel.phone" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Address" [(ngModel)]="editModel.address" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:240px;" />
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitEdit($event)" [disabled]="inflight">Save</button>
+      <button class="btn" (click)="cancelEdit($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="editError" style="margin-top:8px;">{{ editError }}</div>
+</div>

@@ -1,0 +1,22 @@
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2>Admin Settings</h2>
+      <p>Quick shortcuts and environment details.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div>
+      <h4>API Base URL</h4>
+      <p class="muted">{{ apiBase }}</p>
+    </div>
+  </div>
+
+  <div class="grid">
+    <button class="btn ghost" (click)="openAdmin()">Open Django Admin</button>
+    <button class="btn" (click)="clearCache()">Clear Local Cache</button>
+  </div>
+
+  <p class="message" *ngIf="message">{{ message }}</p>
+</section>

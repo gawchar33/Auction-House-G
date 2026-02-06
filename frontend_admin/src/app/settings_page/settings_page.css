@@ -1,0 +1,61 @@
+.panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.panel-header {
+  margin-bottom: 20px;
+}
+
+.panel-header h2 {
+  margin: 0 0 6px;
+}
+
+.panel-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.card {
+  background: #f8fafc;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.card h4 {
+  margin: 0 0 6px;
+}
+
+.muted {
+  color: #64748b;
+}
+
+.grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.message {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #0f172a;
+}

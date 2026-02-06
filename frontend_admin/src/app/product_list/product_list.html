@@ -1,0 +1,84 @@
+<div class="table-header">
+  <div>
+    <h2>Products</h2>
+    <p class="table-subtitle">Manage all products in the system.</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn" (click)="toggleAdd($event)" [disabled]="inflight">Add Product</button>
+    <button class="btn" (click)="loadProducts($event)" [disabled]="inflight">Refresh</button>
+  </div>
+</div>
+
+<div class="status" *ngIf="loading">Loading products…</div>
+<div class="status error" *ngIf="error">{{ error }}</div>
+
+<!-- Inline Add Form -->
+<div class="inline-add" *ngIf="showAdd" style="margin:12px 0;padding:12px;border:1px solid #e6e9ef;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="Name" [(ngModel)]="addModel.name" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input type="number" placeholder="Price" [(ngModel)]="addModel.price" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;width:120px;" />
+    <input type="number" placeholder="Stock" [(ngModel)]="addModel.stock" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;width:120px;" />
+    <input placeholder="Category (id or name)" [(ngModel)]="addModel.category" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input type="file" accept="image/*" (change)="onAddImage($event)" />
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitAdd($event)" [disabled]="inflight">Create</button>
+      <button class="btn" (click)="toggleAdd($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="addError" style="margin-top:8px;">{{ addError }}</div>
+</div>
+
+<div class="table-wrap" *ngIf="!loading && !error">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td>
+           <img 
+             [src] ="mediaURL + product.image"
+             alt=":{{ product.name  }}"
+             class="product-img"
+             />
+        </td>
+
+        <td>{{ product.name }}</td>
+        <td>{{ product.category?.name || product.category }}</td>
+        <td>{{ product.price }}</td>
+        <td>{{ product.stock }}</td>
+        <td>{{ product.created_at | date: 'medium' }}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" (click)="startEdit(product,$event)" [disabled]="inflight">Edit</button>
+            <button class="btn danger" (click)="deleteItem(product,$event)" [disabled]="inflight">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Inline Edit Form -->
+<div class="inline-add" *ngIf="editing" style="margin-top:12px;padding:12px;border:1px solid #fee2e2;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="Name" [(ngModel)]="editModel.name" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input type="number" placeholder="Price" [(ngModel)]="editModel.price" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;width:120px;" />
+    <input type="number" placeholder="Stock" [(ngModel)]="editModel.stock" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;width:120px;" />
+    <input placeholder="Category (id or name)" [(ngModel)]="editModel.category" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input type="file" accept="image/*" (change)="onEditImage($event)" />
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitEdit($event)" [disabled]="inflight">Save</button>
+      <button class="btn" (click)="cancelEdit($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="editError" style="margin-top:8px;">{{ editError }}</div>
+</div>

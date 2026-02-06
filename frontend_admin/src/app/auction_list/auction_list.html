@@ -1,0 +1,84 @@
+<div class="table-header">
+  <div>
+    <h2>Auctions</h2>
+    <p class="table-subtitle">Manage all auctions and status.</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn" (click)="toggleAdd($event)" [disabled]="inflight">Add Auction</button>
+    <button class="btn" (click)="loadAuctions($event)" [disabled]="inflight">Refresh</button>
+  </div>
+</div>
+
+<div class="status" *ngIf="loading">Loading auctions…</div>
+<div class="status error" *ngIf="error">{{ error }}</div>
+
+<!-- Inline Add Form -->
+<div class="inline-add" *ngIf="showAdd" style="margin:12px 0;padding:12px;border:1px solid #e6e9ef;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="Title" [(ngModel)]="addModel.title" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Starting price" type="number" [(ngModel)]="addModel.starting_price" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;width:140px;" />
+    <input placeholder="Category (id)" [(ngModel)]="addModel.category" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:120px;" />
+    <input placeholder="Product (id)" [(ngModel)]="addModel.product" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:120px;" />
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitAdd($event)" [disabled]="inflight">Create</button>
+      <button class="btn" (click)="toggleAdd($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="addError" style="margin-top:8px;">{{ addError }}</div>
+</div>
+
+<div class="table-wrap" *ngIf="!loading && !error">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Starting</th>
+        <th>Current</th>
+        <th>Seller</th>
+        <th>Starts</th>
+        <th>Ends</th>
+        <th>Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let auction of auctions">
+        <td>{{ auction.id }}</td>
+        <td>{{ auction.title }}</td>
+        <td>{{ auction.category?.name || auction.category }}</td>
+        <td>{{ auction.starting_price }}</td>
+        <td>{{ auction.current_price }}</td>
+        <td>{{ auction.seller?.username || auction.seller?.email || auction.seller }}</td>
+        <td>{{ auction.start_time | date: 'short' }}</td>
+        <td>{{ auction.end_time | date: 'short' }}</td>
+        <td>
+          <span class="pill" [class.active]="auction.is_active">
+            {{ auction.is_active ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" (click)="startEdit(auction,$event)" [disabled]="inflight">Edit</button>
+            <button class="btn danger" (click)="deleteItem(auction,$event)" [disabled]="inflight">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Inline Edit Form -->
+<div class="inline-add" *ngIf="editing" style="margin-top:12px;padding:12px;border:1px solid #fee2e2;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="Title" [(ngModel)]="editModel.title" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Starting price" type="number" [(ngModel)]="editModel.starting_price" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;width:140px;" />
+    <label style="display:flex;align-items:center;gap:8px;"><input type="checkbox" [(ngModel)]="editModel.is_active" /> Active</label>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitEdit($event)" [disabled]="inflight">Save</button>
+      <button class="btn" (click)="cancelEdit($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="editError" style="margin-top:8px;">{{ editError }}</div>
+</div>

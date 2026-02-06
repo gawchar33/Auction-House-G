@@ -1,0 +1,20 @@
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2>Export Data</h2>
+      <p>Download JSON exports for each table.</p>
+    </div>
+    <span class="badge" [class.active]="loading">{{ loading ? 'Exporting...' : 'Ready' }}</span>
+  </div>
+
+  <div class="grid">
+    <button class="btn" (click)="exportProducts()">Export Products</button>
+    <button class="btn" (click)="exportCategories()">Export Categories</button>
+    <button class="btn" (click)="exportCustomers()">Export Customers</button>
+    <button class="btn" (click)="exportUsers()">Export Users</button>
+    <button class="btn" (click)="exportAuctions()">Export Auctions</button>
+    <button class="btn" (click)="exportBiddings()">Export Biddings</button>
+  </div>
+
+  <p class="message" *ngIf="message">{{ message }}</p>
+</section>

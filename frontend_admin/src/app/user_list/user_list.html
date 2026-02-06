@@ -1,0 +1,58 @@
+<div class="table-header">
+  <div>
+    <h2>Users</h2>
+    <p class="table-subtitle">Manage all user accounts (from customer profiles).</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn" (click)="loadUsers()">Refresh</button>
+  </div>
+</div>
+
+<div class="status" *ngIf="loading">Loading users…</div>
+<div class="status error" *ngIf="error">{{ error }}</div>
+
+<div class="table-wrap" *ngIf="!loading && !error">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.id }}</td>
+        <td>{{ user.user?.username || user.username }}</td>
+        <td>{{ user.user?.email || user.email }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.address }}</td>
+        <td>{{ user.created_at | date: 'medium' }}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" (click)="startEdit(user,$event)" [disabled]="inflight">Edit</button>
+            <button class="btn danger" (click)="deleteItem(user,$event)" [disabled]="inflight">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Inline Edit Form -->
+<div class="inline-add" *ngIf="editing" style="margin-top:12px;padding:12px;border:1px solid #fee2e2;border-radius:8px;background:#fff;">
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <input placeholder="First name" [(ngModel)]="editModel.first_name" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Last name" [(ngModel)]="editModel.last_name" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:160px;" />
+    <input placeholder="Email" [(ngModel)]="editModel.email" style="padding:8px;border-radius:6px;border:1px solid #d1d5db;min-width:240px;" />
+    <div style="display:flex;gap:8px;">
+      <button class="btn" (click)="submitEdit($event)" [disabled]="inflight">Save</button>
+      <button class="btn" (click)="cancelEdit($event)">Cancel</button>
+    </div>
+  </div>
+  <div class="status error" *ngIf="editError" style="margin-top:8px;">{{ editError }}</div>
+</div>

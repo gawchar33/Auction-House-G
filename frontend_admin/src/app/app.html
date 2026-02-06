@@ -1,0 +1,44 @@
+<ng-container *ngIf="isAuthRoute(); else adminShell">
+  <!-- auth pages (auth, login, register) render full-screen here -->
+  <router-outlet></router-outlet>
+</ng-container>
+
+<ng-template #adminShell>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">AH</div>
+        <div>
+          <div class="brand-title">Auction House</div>
+          <div class="brand-subtitle">Admin Console</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a routerLink="/products" routerLinkActive="active">Products</a>
+        <a routerLink="/users" routerLinkActive="active">Users</a>
+        <a routerLink="/categories" routerLinkActive="active">Categories</a>
+        <a routerLink="/customers" routerLinkActive="active">Customers</a>
+        <a routerLink="/auctions" routerLinkActive="active">Auctions</a>
+        <a routerLink="/biddings" routerLinkActive="active">Biddings</a>
+      </nav>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div>
+          <h1>Admin Tables</h1>
+          <p>Review and manage all project tables in one place.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" (click)="logout()">Logout</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- routed pages render here -->
+        <router-outlet></router-outlet>
+      </div>
+    </section>
+  </div>
+</ng-template>
